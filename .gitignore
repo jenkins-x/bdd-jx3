@@ -1,0 +1,10 @@
+build/
+vendor/
+.idea/
+.vscode/
+reports/
+junit*.xml
+debug.test
+test/suite/*/bdd-*/
+test/suite/jxui/ui-smoke/cypress/screenshots/*
+test/suite/jxui/ui-smoke/node_modules
