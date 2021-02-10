@@ -83,9 +83,6 @@ test-supported-quickstarts:
 test-devpod:
 	$(GO) test $(TESTFLAGS) ./test/suite/devpods
 
-test-jxui:
-	$(GO) test $(TESTFLAGS) ./test/suite/jxui
-
 test-lighthouse:
 	$(GO) test $(TESTFLAGS) ./test/suite/lighthouse
 
@@ -98,6 +95,9 @@ test-quickstart-node-http:
 
 test-quickstart-spring-boot-http-gradle:
 	$(GO) test $(TESTFLAGS) ./test/suite/quickstart -ginkgo.focus=spring-boot-http-gradle
+
+test-quickstart-spring-boot-rest-prometheus-java11:
+	$(GO) test $(TESTFLAGS) ./test/suite/quickstart -ginkgo.focus=spring-boot-rest-prometheus-java11
 
 #target individual imports
 test-import-golang-http-from-jenkins-x-yml:
