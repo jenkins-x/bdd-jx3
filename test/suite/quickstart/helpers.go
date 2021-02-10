@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	IncludedQuickstarts = []string{"node-http", "spring-boot-http-gradle", "golang-http"}
+	IncludedQuickstarts = []string{"node-http", "spring-boot-rest-prometheus-java11", "spring-boot-http-gradle", "golang-http"}
 	_                   = AllQuickstartsTest()
 )
 
