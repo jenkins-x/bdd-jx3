@@ -96,6 +96,9 @@ test-quickstart-node-http:
 test-quickstart-spring-boot-http-gradle:
 	$(GO) test $(TESTFLAGS) ./test/suite/quickstart -ginkgo.focus=spring-boot-http-gradle
 
+test-quickstart-spring:
+	$(GO) test $(TESTFLAGS) ./test/suite/quickstart -ginkgo.focus=spring-boot-rest-prometheus-java11
+
 test-quickstart-spring-boot-rest-prometheus-java11:
 	$(GO) test $(TESTFLAGS) ./test/suite/quickstart -ginkgo.focus=spring-boot-rest-prometheus-java11
 
