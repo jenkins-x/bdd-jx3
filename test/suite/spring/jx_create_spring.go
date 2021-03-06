@@ -42,6 +42,11 @@ var _ = Describe("create spring\n", func() {
 					utils.LogInfof("Using Git provider URL %s", gitProviderUrl)
 					args = append(args, "--git-provider-url", gitProviderUrl)
 				}
+				gitKind := os.Getenv("GIT_KIND")
+				if gitKind != "" {
+					args = append(args, "--git-kind", gitKind)
+				}
+
 				argsStr := strings.Join(args, " ")
 				By(fmt.Sprintf("calling jx %s", argsStr), func() {
 					T.ExpectJxExecution(T.WorkDir, helpers.TimeoutSessionWait, 0, args...)
