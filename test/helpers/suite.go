@@ -177,41 +177,25 @@ func ensureConfiguration() error {
 		_ = os.Setenv("BDD_TIMEOUT_DEVPOD", "15")
 	}
 
-	gheUser := os.Getenv("GHE_USER")
-	if gheUser == "" {
-		gheUser = "dev1"
-		_ = os.Setenv("GHE_USER", gheUser)
-	}
-	gheProviderUrl := os.Getenv("GHE_PROVIDER_URL")
-	if gheProviderUrl == "" {
-		gheProviderUrl = "https://github.beescloud.com"
-		_ = os.Setenv("GHE_PROVIDER_URL", gheProviderUrl)
-	}
-
-	utils.LogInfof("BDD_JX:                                             %s\n", os.Getenv("BDD_JX"))
 	utils.LogInfof("jx version:                                         %s\n", version)
+	utils.LogInfof("GIT_KIND:                                           %s\n", gitKind)
 	utils.LogInfof("GIT_ORGANISATION:                                   %s\n", gitOrganisation)
 	utils.LogInfof("GIT_PROVIDER_URL:                                   %s\n", gitProviderUrl)
-	utils.LogInfof("GIT_KIND:                                           %s\n", gitKind)
+	utils.LogInfof("JX_BDD_INCLUDE_APPS:                                %s\n", includeApps)
 	utils.LogInfof("JX_DISABLE_DELETE_APP:                              %s\n", disableDeleteApp)
 	utils.LogInfof("JX_DISABLE_DELETE_REPO:                             %s\n", disableDeleteRepo)
 	utils.LogInfof("JX_DISABLE_WAIT_FOR_FIRST_RELEASE:                  %s\n", disableWaitForFirstRelease)
 	utils.LogInfof("BDD_ENABLE_TEST_CHATOPS_COMMANDS:                   %s\n", enableChatOpsTestLogStr)
-	utils.LogInfof("JX_BDD_INCLUDE_APPS:                                %s\n", includeApps)
 	utils.LogInfof("BDD_DISABLE_PIPELINEACTIVITY_CHECK:                 %s\n", disablePACheckStr)
+	utils.LogInfof("BDD_JX:                                             %s\n", os.Getenv("BDD_JX"))
+	utils.LogInfof("BDD_LIGHTHOUSE_BASE_REPORT_URL:                     %s\n", LighthouseBaseReportURL)
 	utils.LogInfof("BDD_TIMEOUT_BUILD_COMPLETES timeout value:          %s\n", os.Getenv("BDD_TIMEOUT_BUILD_COMPLETES"))
 	utils.LogInfof("BDD_TIMEOUT_BUILD_RUNNING_IN_STAGING timeout value: %s\n", os.Getenv("BDD_TIMEOUT_BUILD_RUNNING_IN_STAGING"))
 	utils.LogInfof("BDD_TIMEOUT_URL_RETURNS timeout value:              %s\n", os.Getenv("BDD_TIMEOUT_URL_RETURNS"))
 	utils.LogInfof("BDD_TIMEOUT_CMD_LINE timeout value:                 %s\n", os.Getenv("BDD_TIMEOUT_CMD_LINE"))
 	utils.LogInfof("BDD_TIMEOUT_APP_TESTS timeout value:                %s\n", os.Getenv("BDD_TIMEOUT_APP_TESTS"))
 	utils.LogInfof("BDD_TIMEOUT_SESSION_WAIT timeout value:             %s\n", os.Getenv("BDD_TIMEOUT_SESSION_WAIT"))
-	utils.LogInfof("BDD_TIMEOUT_DEVPOD timeout value:             	   %s\n", os.Getenv("BDD_TIMEOUT_DEVPOD"))
-	utils.LogInfof("BDD_FORCE_LOCAL_AUTH_CONFIG:             		   %s\n", os.Getenv("BDD_FORCE_LOCAL_AUTH_CONFIG"))
 	utils.LogInfof("SLOW_SPEC_THRESHOLD:                                %s\n", os.Getenv("SLOW_SPEC_THRESHOLD"))
-	utils.LogInfof("GHE_USER:                                           %s\n", os.Getenv("GHE_USER"))
-	utils.LogInfof("GHE_TOKEN:                                          %s\n", os.Getenv("GHE_TOKEN"))
-	utils.LogInfof("GHE_PROVIDER_URL:                                   %s\n", os.Getenv("GHE_PROVIDER_URL"))
-	utils.LogInfof("BDD_LIGHTHOUSE_BASE_REPORT_URL:                     %s\n", LighthouseBaseReportURL)
 	return nil
 }
 
