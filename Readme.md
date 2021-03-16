@@ -37,9 +37,6 @@ Most of the settings are quite specific and need to be used explicitly in your t
 |BDD_TIMEOUT_DEVPOD            	     | Timeout waiting for devpod to appear. |
 |BDD_TIMEOUT_SESSION_WAIT            | Timeout waiting for `jx` command to complete. |
 |BDD_TIMEOUT_URL_RETURNS             | Timeout waiting for a given URL to become available. |
-|GHE_PROVIDER_URL                    | ? |
-|GHE_TOKEN                           | ? |
-|GHE_USER                            | ? |
 |GIT_ORGANISATION                    | GitHub organization used as owner for created repositories. |
 |GIT_PROVIDER_URL                    | Git provider URL. |
 |JX_BDD_INCLUDE_APPS                 | Comma separated list of apps for which to test the app life cycle. Defaults to _jx-app-jacoco:0.0.100_|
