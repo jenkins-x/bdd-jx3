@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/pkg/errors"
 
 	"k8s.io/apimachinery/pkg/util/rand"
 
@@ -303,8 +303,7 @@ func (t *TestOptions) NextBuildNumber(repo *gits.GitRepository) string {
 
 	return strconv.Itoa(nextBuildInt)
 }
- */
-
+*/
 
 // GetPullTitleForBranch returns the PullTitle field from the PipelineActivity for the owner/repo/branch
 func (t *TestOptions) GetPullTitleFromActivity(owner string, repo string, branch string, buildNumber int) string {
@@ -1144,7 +1143,7 @@ func (t *TestOptions) WaitForPullRequestToMerge(provider gits.GitProvider, owner
 }
 
 
- */
+*/
 
 // Retry retries the given function up to the maximum duration
 func Retry(maxDuration time.Duration, f func() error) error {
@@ -1174,7 +1173,6 @@ func (t *TestOptions) GetApplicationName() string {
 	}
 	return applicationName
 }
-
 
 // TailSpecificBuildLog tails the logs of the specified job and number, not passing a specific build number to "jx get build logs"
 // if the build number is 0.
@@ -1259,6 +1257,15 @@ func (t *TestOptions) ThereShouldBeAJobThatCompletesSuccessfully(jobName string,
 	return buildNumber
 }
 
+// ViewPromotePRPipelineLog views the latest PR pipeline log on the dev environment
+func (t *TestOptions) ViewPromotePRPipelineLog(maxDuration time.Duration) {
+	args := []string{"pipeline", "log", "-e", "dev", "-b", "--pending", "--wait"}
+	argsStr := strings.Join(args, " ")
+	By(fmt.Sprintf("viewing the promote PR pipeline log by calling: jx %s", argsStr), func() {
+		t.ExpectJxExecution(t.WorkDir, maxDuration, 0, args...)
+	})
+}
+
 // ExpectCommandExecution performs the given command in the current work directory and asserts that it completes successfully
 func (t *TestOptions) ExpectCommandExecution(dir string, commandTimeout time.Duration, exitCode int, c string, args ...string) {
 	f := func() error {
@@ -1324,7 +1331,6 @@ func (t *TestOptions) ShouldTestPipelineActivityUpdate() bool {
 	return strings.ToLower(DisablePipelineActivityCheck) != "true"
 }
 
-
 // GitProviderURL Gets the current git provider URL
 func (t *TestOptions) GitProviderURL() (string, error) {
 	gitProviderURL := os.Getenv("GIT_PROVIDER_URL")
@@ -1372,7 +1378,6 @@ func (t *TestOptions) TestPullRequest() bool {
 	return strings.ToLower(text) != "true"
 }
 
-
 // WaitForFirstRelease should we wait for first release to complete before trying a pull request
 func (t *TestOptions) WaitForFirstRelease() bool {
 	text := os.Getenv("JX_DISABLE_WAIT_FOR_FIRST_RELEASE")
@@ -1384,3 +1389,8 @@ func (t *TestOptions) WeShouldTestChatOpsCommands() bool {
 	return strings.ToLower(EnableChatOpsTests) == "true"
 }
 
+// ViewPromotePRPipelines returns true if we should view the PR pipeline logs
+func (t *TestOptions) ViewPromotePRPipelines() bool {
+	text := os.Getenv("JX_VIEW_PROMOTE_PR_LOG")
+	return strings.ToLower(text) == "true"
+}

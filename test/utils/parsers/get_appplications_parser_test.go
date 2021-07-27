@@ -16,3 +16,19 @@ bdd-spring-1561456570 0.0.1   1/1  http://bdd-spring-1561456570.bdd-ghe-jx-pr-41
 	assert.NoError(t, err)
 	assert.Len(t, applications, 1)
 }
+
+func TestGetRemoteApplicationsParser(t *testing.T) {
+	out := `APPLICATION           PRODUCTION PODS URL
+bdd-spring-1617112975 0.0.1           http://bdd-spring-1617112975-myapps.34.123.71.97.nip.io`
+	applications, err := parsers.ParseJxGetApplications(out)
+	assert.NoError(t, err)
+	assert.Len(t, applications, 1)
+
+	for k, v := range applications {
+		assert.Equal(t, "bdd-spring-1617112975", k, "should find first application")
+		assert.Equal(t, "0.0.1", v.Version, "found app.Version")
+		assert.Equal(t, "http://bdd-spring-1617112975-myapps.34.123.71.97.nip.io", v.Url, "found app.Url")
+		assert.Equal(t, 0, v.RunningPods, "found app.RunningPods")
+		assert.Equal(t, 0, v.DesiredPods, "found app.DesiredPods")
+	}
+}

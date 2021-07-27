@@ -99,6 +99,13 @@ func createQuickstartTests(quickstartName string) bool {
 						time.Sleep(30 * time.Second)
 						By(fmt.Sprintf("waiting for the first release of %s", applicationName), func() {
 							T.ThereShouldBeAJobThatCompletesSuccessfully(jobName, helpers.TimeoutBuildCompletes)
+
+							if T.ViewPromotePRPipelines() {
+								T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
+								T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
+								T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
+							}
+
 							T.TheApplicationIsRunningInStaging(200)
 						})
 
