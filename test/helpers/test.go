@@ -3,7 +3,9 @@ package helpers
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/cli"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
 	"github.com/pkg/errors"
 	"io/ioutil"
@@ -417,7 +419,8 @@ func getApplication(applicationName string, runningApplications map[string]parse
 func (t *TestOptions) TheApplicationShouldBeBuiltAndPromotedViaCICD(statusCode int) {
 	applicationName := t.GetApplicationName()
 	owner := t.GetGitOrganisation()
-	jobName := owner + "/" + applicationName + "/master"
+	branch := t.GetDefaultBranch()
+	jobName := owner + "/" + applicationName + "/" + branch
 
 	By(fmt.Sprintf("checking that job %s completes successfully", jobName), func() {
 		t.ThereShouldBeAJobThatCompletesSuccessfully(jobName, TimeoutBuildCompletes)
@@ -1393,4 +1396,20 @@ func (t *TestOptions) WeShouldTestChatOpsCommands() bool {
 func (t *TestOptions) ViewPromotePRPipelines() bool {
 	text := os.Getenv("JX_VIEW_PROMOTE_PR_LOG")
 	return strings.ToLower(text) == "true"
+}
+
+// GetDefaultBranch returns the default branch name
+func (t *TestOptions) GetDefaultBranch() string {
+	gitter := cli.NewCLIClient("", cmdrunner.QuietCommandRunner)
+
+	defaultBranch := "master"
+	text, err := gitter.Command(".", "config", "--global", "--get", "init.defaultBranch")
+	if err == nil {
+		text := strings.TrimSpace(text)
+		if text != "" {
+			defaultBranch = text
+		}
+	}
+	utils.LogInfof("using default branch: %s\n", defaultBranch)
+	return defaultBranch
 }

@@ -92,7 +92,8 @@ func createQuickstartTests(quickstartName string) bool {
 
 					applicationName := T.GetApplicationName()
 					owner := T.GetGitOrganisation()
-					jobName := owner + "/" + applicationName + "/master"
+					branch := T.GetDefaultBranch()
+					jobName := owner + "/" + applicationName + "/" + branch
 
 					if T.WaitForFirstRelease() {
 						//FIXME Need to wait a little here to ensure that the build has started before asking for the log as the jx create quickstart command returns slightly before the build log is available
@@ -101,8 +102,6 @@ func createQuickstartTests(quickstartName string) bool {
 							T.ThereShouldBeAJobThatCompletesSuccessfully(jobName, helpers.TimeoutBuildCompletes)
 
 							if T.ViewPromotePRPipelines() {
-								T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
-								T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
 								T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
 							}
 
@@ -115,7 +114,7 @@ func createQuickstartTests(quickstartName string) bool {
 							})
 						}
 					} else {
-						By(fmt.Sprintf("waiting for the first successful build of master of %s", applicationName), func() {
+						By(fmt.Sprintf("waiting for the first successful build of %s of %s", branch, applicationName), func() {
 							T.ThereShouldBeAJobThatCompletesSuccessfully(jobName, helpers.TimeoutBuildCompletes)
 						})
 					}
