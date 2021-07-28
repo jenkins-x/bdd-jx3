@@ -125,6 +125,8 @@ func createQuickstartTests(quickstartName string) bool {
 
 						if T.ViewPromotePRPipelines() {
 							T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
+
+							T.ViewBootJob(helpers.TimeoutBuildCompletes)
 						}
 					} else {
 						utils.LogInfof("not the app %s", T.ApplicationName)

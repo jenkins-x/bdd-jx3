@@ -1269,6 +1269,16 @@ func (t *TestOptions) ViewPromotePRPipelineLog(maxDuration time.Duration) {
 	})
 }
 
+// ViewBootJob views the boot job
+func (t *TestOptions) ViewBootJob(maxDuration time.Duration) {
+	utils.LogInfof("viewing the boot job log....")
+	args := []string{"admin", "log", "-w"}
+	argsStr := strings.Join(args, " ")
+	By(fmt.Sprintf("viewing the boot job by calling: jx %s", argsStr), func() {
+		t.ExpectJxExecution(t.WorkDir, maxDuration, 0, args...)
+	})
+}
+
 // ExpectCommandExecution performs the given command in the current work directory and asserts that it completes successfully
 func (t *TestOptions) ExpectCommandExecution(dir string, commandTimeout time.Duration, exitCode int, c string, args ...string) {
 	f := func() error {
