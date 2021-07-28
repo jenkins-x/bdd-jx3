@@ -108,11 +108,6 @@ func createQuickstartTests(quickstartName string) bool {
 							T.TheApplicationIsRunningInStaging(200)
 						})
 
-						if T.TestPullRequest() {
-							By("performing a pull request on the source and asserting that a preview environment is created", func() {
-								T.CreatePullRequestAndGetPreviewEnvironment(200)
-							})
-						}
 					} else {
 						By(fmt.Sprintf("waiting for the first successful build of %s of %s", branch, applicationName), func() {
 							T.ThereShouldBeAJobThatCompletesSuccessfully(jobName, helpers.TimeoutBuildCompletes)
@@ -133,6 +128,13 @@ func createQuickstartTests(quickstartName string) bool {
 						}
 					} else {
 						utils.LogInfof("not the app %s", T.ApplicationName)
+					}
+
+					if T.TestPullRequest() {
+						utils.LogInfof("now performing a PR to test a preview")
+						By("performing a pull request on the source and asserting that a preview environment is created", func() {
+							T.CreatePullRequestAndGetPreviewEnvironment(200)
+						})
 					}
 
 					if T.DeleteRepos() {
