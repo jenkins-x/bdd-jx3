@@ -121,9 +121,9 @@ func ensureConfiguration() error {
 		os.Setenv("GIT_KIND", gitKind)
 	}
 	disableDeleteAppStr := os.Getenv("JX_DISABLE_DELETE_APP")
-	disableDeleteApp := "is set. Apps created in the test run will NOT be deleted"
+	disableDeleteApp := "is not set. Applications will be deleted from staging after they are promoted."
 	if disableDeleteAppStr == "true" || disableDeleteAppStr == "1" || disableDeleteAppStr == "on" {
-		disableDeleteApp = "is not set. If you would like to disable the automatic deletion of apps created by the tests set this variable to TRUE."
+		disableDeleteApp = "is set. Apps will NOT be deleted from Staging after they are provisioned"
 	}
 	disableDeleteRepoStr := os.Getenv("JX_DISABLE_DELETE_REPO")
 	disableDeleteRepo := "is set. Repos created in the test run will NOT be deleted"
