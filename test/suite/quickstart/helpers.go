@@ -120,6 +120,8 @@ func createQuickstartTests(quickstartName string) bool {
 					}
 
 					if T.DeleteApplications() {
+						utils.LogInfof("deleting the app %s", T.ApplicationName)
+
 						args = []string{"application", "delete", "--no-source", "--repo", T.ApplicationName}
 						argsStr := strings.Join(args, " ")
 						By(fmt.Sprintf("calling %s to delete the application", argsStr), func() {
@@ -129,6 +131,8 @@ func createQuickstartTests(quickstartName string) bool {
 						if T.ViewPromotePRPipelines() {
 							T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
 						}
+					} else {
+						utils.LogInfof("not the app %s", T.ApplicationName)
 					}
 
 					if T.DeleteRepos() {

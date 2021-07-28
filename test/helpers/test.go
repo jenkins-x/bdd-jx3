@@ -1366,6 +1366,7 @@ func (t *TestOptions) GitProviderURL() (string, error) {
 // DeleteApplications should we delete applications after the quickstart has run
 func (t *TestOptions) DeleteApplications() bool {
 	text := os.Getenv("JX_DISABLE_DELETE_APP")
+	utils.LogInfof("checking to delete app: JX_DISABLE_DELETE_APP = %s", text)
 	return strings.ToLower(text) != "true"
 }
 
