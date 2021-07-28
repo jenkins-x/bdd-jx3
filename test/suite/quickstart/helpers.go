@@ -120,11 +120,15 @@ func createQuickstartTests(quickstartName string) bool {
 					}
 
 					if T.DeleteApplications() {
-						args = []string{"delete", "application", "-b", T.ApplicationName}
+						args = []string{"application", "delete", "--no-source", "--repo", T.ApplicationName}
 						argsStr := strings.Join(args, " ")
 						By(fmt.Sprintf("calling %s to delete the application", argsStr), func() {
 							T.ExpectJxExecution(T.WorkDir, helpers.TimeoutSessionWait, 0, args...)
 						})
+
+						if T.ViewPromotePRPipelines() {
+							T.ViewPromotePRPipelineLog(helpers.TimeoutBuildCompletes)
+						}
 					}
 
 					if T.DeleteRepos() {
