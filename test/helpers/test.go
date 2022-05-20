@@ -108,6 +108,7 @@ type TestOptions struct {
 	WorkDir         string
 	ApplicationName string
 	Organisation    string
+	JavaVersion     string
 }
 
 func AssignWorkDirValue(generatedWorkDir string) {

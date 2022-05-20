@@ -34,7 +34,7 @@ var _ = Describe("create spring\n", func() {
 	Describe("Given valid parameters", func() {
 		Context("when running jx create spring", func() {
 			It("creates a spring application and promotes it to staging\n", func() {
-				args := []string{"create", "spring", "-b", "--org", T.GetGitOrganisation(), "--artifact", T.ApplicationName, "--name", T.ApplicationName, "-d", "web", "-d", "actuator"}
+				args := []string{"project", "spring", "-b", "--org", T.GetGitOrganisation(), "--artifact", T.ApplicationName, "--name", T.ApplicationName, "-j", T.JavaVersion, "-d", "web", "-d", "actuator"}
 
 				gitProviderUrl, err := T.GitProviderURL()
 				Expect(err).NotTo(HaveOccurred())
