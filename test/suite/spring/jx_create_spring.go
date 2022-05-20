@@ -26,6 +26,7 @@ var _ = Describe("create spring\n", func() {
 			helpers.TestOptions{
 				ApplicationName: helpers.TempDirPrefix + "spring-" + strconv.FormatInt(GinkgoRandomSeed(), 10),
 				WorkDir:         helpers.WorkDir,
+				JavaVersion:     "11",
 			},
 		}
 		T.GitProviderURL()
