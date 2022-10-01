@@ -1,5 +1,5 @@
 NAME := bdd-jx
-GO := GO111MODULE=on go
+GO := GO111MODULE=on CGO_ENABLED=0 go
 
 PACKAGE_DIRS = $(shell $(GO) list ./test/...)
 
