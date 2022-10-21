@@ -13,20 +13,19 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	SkipManualPromotion = os.Getenv("JX_BDD_SKIP_MANUAL_PROMOTION")
-)
+var SkipManualPromotion = os.Getenv("JX_BDD_SKIP_MANUAL_PROMOTION")
 
 var _ = Describe("create spring\n", func() {
 	var T SpringTestOptions
 
 	BeforeEach(func() {
 		T = SpringTestOptions{
-
 			helpers.TestOptions{
 				ApplicationName: helpers.TempDirPrefix + "spring-" + strconv.FormatInt(GinkgoRandomSeed(), 10),
 				WorkDir:         helpers.WorkDir,
+				// ToDo(@ankitm123): parametrize this instead of hardcoding this
 				JavaVersion:     "11",
+				ProjectType:     "maven-project",
 			},
 		}
 		T.GitProviderURL()
@@ -35,7 +34,7 @@ var _ = Describe("create spring\n", func() {
 	Describe("Given valid parameters", func() {
 		Context("when running jx create spring", func() {
 			It("creates a spring application and promotes it to staging\n", func() {
-				args := []string{"project", "spring", "-b", "--org", T.GetGitOrganisation(), "--artifact", T.ApplicationName, "--name", T.ApplicationName, "-j", T.JavaVersion, "-d", "web", "-d", "actuator"}
+				args := []string{"project", "spring", "-b", "--org", T.GetGitOrganisation(), "--artifact", T.ApplicationName, "--name", T.ApplicationName, "-j", T.JavaVersion, "-d", "web", "-d", "actuator", "--type", T.ProjectType}
 
 				gitProviderUrl, err := T.GitProviderURL()
 				Expect(err).NotTo(HaveOccurred())
