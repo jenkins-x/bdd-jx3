@@ -17,14 +17,17 @@ var SkipManualPromotion = os.Getenv("JX_BDD_SKIP_MANUAL_PROMOTION")
 
 var _ = Describe("create spring\n", func() {
 	var T SpringTestOptions
+	JavaVersion, ok := os.LookupEnv("JAVA_VERSION")
+	if !ok {
+		JavaVersion = "17"
+	}
 
 	BeforeEach(func() {
 		T = SpringTestOptions{
 			helpers.TestOptions{
 				ApplicationName: helpers.TempDirPrefix + "spring-" + strconv.FormatInt(GinkgoRandomSeed(), 10),
 				WorkDir:         helpers.WorkDir,
-				// ToDo(@ankitm123): parametrize this instead of hardcoding this
-				JavaVersion:     "11",
+				JavaVersion:     JavaVersion,
 				ProjectType:     "maven-project",
 			},
 		}
