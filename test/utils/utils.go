@@ -8,8 +8,6 @@ import (
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/cenkalti/backoff"
 )
 
 // GetEnv fetches a timeout value from an environment variable, and returns the fallback value if that variable does not exist
@@ -28,41 +26,6 @@ func GetEnv(key, fallback string) string {
 	}
 	return fallback
 }
-
-/*
-func GetJenkinsClient() (gojenkins.JenkinsClient, error) {
-	url := os.Getenv("BDD_JENKINS_URL")
-	if url == "" {
-		return nil, errors.New("no BDD_JENKINS_URL env var set. Try running this command first:\n\n  eval $(gofabric8 bdd-env)\n")
-	}
-	username := os.Getenv("BDD_JENKINS_USERNAME")
-	token := os.Getenv("BDD_JENKINS_TOKEN")
-
-	bearerToken := os.Getenv("BDD_JENKINS_BEARER_TOKEN")
-	if bearerToken == "" && (token == "" || username == "") {
-		return nil, errors.New("no BDD_JENKINS_TOKEN or BDD_JENKINS_BEARER_TOKEN && BDD_JENKINS_USERNAME env var set")
-	}
-
-	auth := &gojenkins.Auth{
-		Username:    username,
-		ApiToken:    token,
-		BearerToken: bearerToken,
-	}
-	jenkins := gojenkins.NewJenkins(auth, url)
-
-	// handle insecure TLS for minishift
-	httpClient := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		}}
-	jenkins.SetHTTPClient(httpClient)
-	return jenkins, nil
-}
-
- */
 
 func GetFileAsString(path string) (string, error) {
 	buf, err := ioutil.ReadFile(path)
@@ -130,13 +93,4 @@ func CopyDir(source string, dest string) (err error) {
 func Random(min, max int) int {
 	rand.Seed(time.Now().Unix())
 	return rand.Intn(max-min) + min
-}
-
-// Retry retries with exponential backoff the given function
-func Retry(maxElapsedTime time.Duration, f func() error) error {
-	bo := backoff.NewExponentialBackOff()
-	bo.MaxElapsedTime = maxElapsedTime
-	bo.Reset()
-	return backoff.Retry(f, bo)
-
 }

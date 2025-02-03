@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -9,8 +10,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/jenkins-x/bdd-jx/test/utils"
 	. "github.com/onsi/ginkgo"
@@ -62,7 +61,7 @@ func (r *JxRunner) run(out io.Writer, errOut io.Writer, args ...string) error {
 	command.Dir = r.cwd
 	session, err := gexec.Start(command, out, errOut)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	session.Wait(r.timeout)
 	Eventually(session).Should(gexec.Exit())
@@ -70,7 +69,7 @@ func (r *JxRunner) run(out io.Writer, errOut io.Writer, args ...string) error {
 		utils.LogInfof("\033[1mRUNNER:\033[0mExecution completed with exit code %d\n", session.ExitCode())
 	}
 	if session.ExitCode() != r.exitCode {
-		return errors.Errorf("expected exit code %d but got %d whilst running command %s %s", r.exitCode, session.ExitCode(), Jx, strings.Join(args, " "))
+		return fmt.Errorf("expected exit code %d but got %d whilst running command %s %s", r.exitCode, session.ExitCode(), Jx, strings.Join(args, " "))
 	}
 	return nil
 }
@@ -79,26 +78,26 @@ func (r *JxRunner) run(out io.Writer, errOut io.Writer, args ...string) error {
 func (r *JxRunner) RunWithOutput(args ...string) (string, error) {
 	rOut, out, err := os.Pipe()
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", err
 	}
 
 	// combine out and errOut
 	rErr := r.run(out, out, args...)
 	err = out.Close()
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", err
 	}
 	outBytes, err := ioutil.ReadAll(rOut)
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", err
 	}
 	err = rOut.Close()
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", err
 	}
 	answer := string(outBytes)
 	if rErr != nil {
-		return "", errors.Wrapf(err, "running jx %s output %s", strings.Join(args, " "), answer)
+		return "", fmt.Errorf("running jx %s output %s: %w", strings.Join(args, " "), answer, err)
 	}
 	return strings.TrimSpace(RemoveCoverageText(answer, args...)), nil
 }
@@ -123,7 +122,7 @@ func (r *JxRunner) RunWithOutputNoTimeout(args ...string) (string, error) {
 
 	answer = strings.TrimSpace(RemoveCoverageText(answer, args...))
 	if err != nil {
-		return answer, errors.WithStack(err)
+		return answer, err
 	}
 	return answer, nil
 }
