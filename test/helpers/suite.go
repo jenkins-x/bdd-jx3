@@ -17,8 +17,8 @@ import (
 	"github.com/onsi/ginkgo/config"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/jenkins-x/bdd-jx/test/utils"
-	"github.com/jenkins-x/bdd-jx/test/utils/runner"
+	"github.com/jenkins-x/bdd-jx3/test/utils"
+	"github.com/jenkins-x/bdd-jx3/test/utils/runner"
 
 	gr "github.com/onsi/ginkgo/reporters"
 

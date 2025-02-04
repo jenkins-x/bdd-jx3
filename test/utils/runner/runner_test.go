@@ -3,7 +3,7 @@ package runner_test
 import (
 	"testing"
 
-	"github.com/jenkins-x/bdd-jx/test/utils/runner"
+	"github.com/jenkins-x/bdd-jx3/test/utils/runner"
 	"github.com/stretchr/testify/assert"
 )
 

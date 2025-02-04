@@ -1,4 +1,4 @@
-module github.com/jenkins-x/bdd-jx
+module github.com/jenkins-x/bdd-jx3
 
 require (
 	github.com/cenkalti/backoff/v5 v5.0.1

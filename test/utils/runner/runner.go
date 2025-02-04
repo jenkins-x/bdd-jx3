@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jenkins-x/bdd-jx/test/utils"
+	"github.com/jenkins-x/bdd-jx3/test/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"

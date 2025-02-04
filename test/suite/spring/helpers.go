@@ -1,7 +1,7 @@
 package spring
 
 import (
-	"github.com/jenkins-x/bdd-jx/test/helpers"
+	"github.com/jenkins-x/bdd-jx3/test/helpers"
 )
 
 type SpringTestOptions struct {

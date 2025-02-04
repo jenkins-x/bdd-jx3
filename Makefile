@@ -125,11 +125,11 @@ test-single-import:
 	$(GO) test $(TESTFLAGS) ./test/suite/_import -ginkgo.focus=${BDD_TEST_SINGLE_IMPORT}
 
 testbin:
-	$(GO) test $(TESTFLAGS) -c github.com/jenkins-x/bdd-jx/test/suite/main -o build/bddjx $(TEST_BUILDFLAGS)
-#	$(GO) test $(TESTFLAGS) -c github.com/jenkins-x/bdd-jx/test/suite/quickstart -o build/bddjx $(TEST_BUILDFLAGS)
+	$(GO) test $(TESTFLAGS) -c github.com/jenkins-x/bdd-jx3/test/suite/main -o build/bddjx $(TEST_BUILDFLAGS)
+#	$(GO) test $(TESTFLAGS) -c github.com/jenkins-x/bdd-jx3/test/suite/quickstart -o build/bddjx $(TEST_BUILDFLAGS)
 
 linux:
-	GOOS=linux GOARCH=amd64 $(GO) test $(TESTFLAGS) -c github.com/jenkins-x/bdd-jx/test/suite/main -o build/linux/bddjx $(TEST_BUILDFLAGS)
+	GOOS=linux GOARCH=amd64 $(GO) test $(TESTFLAGS) -c github.com/jenkins-x/bdd-jx3/test/suite/main -o build/linux/bddjx $(TEST_BUILDFLAGS)
 
 bdd-init:
 	echo "About to run the BDD tests on the current cluster"
@@ -145,8 +145,3 @@ bdd-init:
 bdd: bdd-init $(SUITE)
 
 saas: bdd test-saas
-
-.PHONY: goreleaser
-goreleaser:
-	step-go-releaser --organisation=$(ORG) --revision=$(REV) --branch=$(BRANCH) --build-date=$(BUILD_DATE) --go-version=$(GO_VERSION) --root-package=$(ROOT_PACKAGE) --version=$(VERSION) --timeout 200m
-

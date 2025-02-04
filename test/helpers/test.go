@@ -23,11 +23,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/cenkalti/backoff/v5"
-	"github.com/jenkins-x/bdd-jx/test/utils"
-	"github.com/jenkins-x/bdd-jx/test/utils/parsers"
+	"github.com/jenkins-x/bdd-jx3/test/utils"
+	"github.com/jenkins-x/bdd-jx3/test/utils/parsers"
 	"github.com/onsi/gomega/gexec"
 
-	"github.com/jenkins-x/bdd-jx/test/utils/runner"
+	"github.com/jenkins-x/bdd-jx3/test/utils/runner"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

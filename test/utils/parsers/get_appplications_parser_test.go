@@ -3,7 +3,7 @@ package parsers_test
 import (
 	"testing"
 
-	"github.com/jenkins-x/bdd-jx/test/utils/parsers"
+	"github.com/jenkins-x/bdd-jx3/test/utils/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
