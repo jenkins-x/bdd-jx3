@@ -86,7 +86,7 @@ func ensureConfiguration() error {
 	}
 
 	r := runner.New(cwd, &TimeoutSessionWait, 0)
-	version, err := r.RunWithOutput("--version")
+	version, err := r.RunWithOutput("version")
 	if err != nil {
 		return err
 	}
