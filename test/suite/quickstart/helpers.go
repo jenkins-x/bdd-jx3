@@ -2,18 +2,17 @@ package quickstart
 
 import (
 	"fmt"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
 
-	"github.com/jenkins-x/bdd-jx/test/helpers"
+	"github.com/jenkins-x/bdd-jx3/test/helpers"
 
-	"github.com/jenkins-x/bdd-jx/test/utils"
+	"github.com/jenkins-x/bdd-jx3/test/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -30,10 +29,7 @@ func AllQuickstartsTest() []bool {
 	cmd := exec.Command("jx", "get", "quickstarts")
 	bytes, err := cmd.CombinedOutput()
 	if err != nil {
-		panic(errors.Wrapf(err, "running jx get quickstarts, output was %s", string(bytes)))
-	}
-	if err != nil {
-		panic(errors.WithStack(err))
+		panic(fmt.Errorf("running jx get quickstarts, output was %s: %w", string(bytes), err))
 	}
 	tests := make([]bool, 0)
 	for _, testQuickstartName := range IncludedQuickstarts {
@@ -42,7 +38,7 @@ func AllQuickstartsTest() []bool {
 	return tests
 }
 
-//CreateQuickstartsTests creates a batch quickstart test for the given quickstart
+// CreateQuickstartsTests creates a batch quickstart test for the given quickstart
 func CreateQuickstartsTests(quickstartName string) bool {
 	return createQuickstartTests(quickstartName)
 }

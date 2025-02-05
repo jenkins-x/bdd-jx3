@@ -1,7 +1,7 @@
 package parsers
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 	"strings"
 )
 
@@ -31,7 +31,7 @@ func ParseJxGetPreviews(s string) (map[string]Preview, error) {
 		}
 		fields := strings.Fields(line)
 		if len(fields) != 3 {
-			return nil, errors.Errorf("must be three fields in %s, entire output was %s", line, s)
+			return nil, fmt.Errorf("must be three fields in %s, entire output was %s", line, s)
 		}
 		answer[fields[0]] = Preview{
 			PullRequest: fields[0],

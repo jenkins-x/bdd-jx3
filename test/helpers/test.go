@@ -1,13 +1,15 @@
 package helpers
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
+
 	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/cli"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
-	"github.com/pkg/errors"
+
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -20,12 +22,12 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	"github.com/cenkalti/backoff"
-	"github.com/jenkins-x/bdd-jx/test/utils"
-	"github.com/jenkins-x/bdd-jx/test/utils/parsers"
+	"github.com/cenkalti/backoff/v5"
+	"github.com/jenkins-x/bdd-jx3/test/utils"
+	"github.com/jenkins-x/bdd-jx3/test/utils/parsers"
 	"github.com/onsi/gomega/gexec"
 
-	"github.com/jenkins-x/bdd-jx/test/utils/runner"
+	"github.com/jenkins-x/bdd-jx3/test/utils/runner"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -44,8 +46,7 @@ var (
 	// TempDirPrefix The prefix to append to applicationss created in testing
 	TempDirPrefix = "bdd-"
 	// WorkDir The current working directory
-	WorkDir              string
-	DefaultRepositoryURL = "http://chartmuseum.jenkins-x.io"
+	WorkDir string
 
 	// all timeout values are in minutes
 	// timeout for a build to complete successfully
@@ -340,7 +341,7 @@ func (t *TestOptions) TheApplicationIsRunning(statusCode int, environment string
 	args := []string{"get", "applications", "-e", environment}
 	r := runner.New(t.WorkDir, nil, 0)
 	argsStr := strings.Join(args, " ")
-	f := func() error {
+	f := func() (interface{}, error) {
 		var err error
 		var out string
 		By(fmt.Sprintf("running jx %s", argsStr), func() {
@@ -354,7 +355,7 @@ func (t *TestOptions) TheApplicationIsRunning(statusCode int, environment string
 		if err != nil {
 			// Need to do return an error here to perform a retry and backoff
 			utils.LogInfof("failed to parse applications: %s\n", err.Error())
-			return err
+			return nil, err
 		}
 
 		applicationName := t.GetApplicationName()
@@ -364,17 +365,17 @@ func (t *TestOptions) TheApplicationIsRunning(statusCode int, environment string
 		})
 		if err != nil {
 			utils.LogInfof("failed to get application: %s. Output of jx %s was %s. Parsed applications map is %v`\n", err.Error(), argsStr, out, applications)
-			return err
+			return nil, err
 		}
 		Expect(application).ShouldNot(BeNil(), "no application found for % in environment %s", applicationName, environment)
 		By(fmt.Sprintf("getting url for application %s", application.Name), func() {
 			u = application.Url
 		})
 		if u == "" {
-			return fmt.Errorf("no URL found for environment %s has app: %#v", environment, applications)
+			return nil, fmt.Errorf("no URL found for environment %s has app: %#v", environment, applications)
 		}
 		utils.LogInfof("still looking for application %s in env %s\n", applicationName, environment)
-		return nil
+		return nil, nil
 	}
 
 	By(fmt.Sprintf("retrying jx %s with exponential backoff", argsStr), func() {
@@ -535,18 +536,18 @@ func (t *TestOptions) CreatePullRequestAndGetPreviewEnvironment(statusCode int) 
 		return err
 	}
 
-	f := func() error {
+	f := func() (interface{}, error) {
 		var err error
 		var previews map[string]parsers.Preview
 
 		utils.LogInfof("parsing the output of jx %s", argsStr)
 		out, err = r.RunWithOutput(args...)
 		if err != nil {
-			return logError(err)
+			return nil, logError(err)
 		}
 		previews, err = parsers.ParseJxGetPreviews(out)
 		if err != nil {
-			return logError(err)
+			return nil, logError(err)
 		}
 		previewEnv := previews[pr.Url]
 		applicationUrl := previewEnv.Url
@@ -563,20 +564,20 @@ func (t *TestOptions) CreatePullRequestAndGetPreviewEnvironment(statusCode int) 
 			}
 		}
 		if applicationUrl == "" {
-			return logError(fmt.Errorf("no Preview Application URL found for PR %s", pr.Url))
+			return nil, logError(fmt.Errorf("no Preview Application URL found for PR %s", pr.Url))
 		}
 
 		utils.LogInfof("Running Preview Environment application at: %s\n", termcolor.ColorInfo(applicationUrl))
 
 		err = t.ExpectUrlReturns(applicationUrl, statusCode, TimeoutUrlReturns)
 		if err != nil {
-			return logError(fmt.Errorf("preview URL at %s not working: %s", applicationUrl, err.Error()))
+			return nil, logError(fmt.Errorf("preview URL at %s not working: %s", applicationUrl, err.Error()))
 		}
-		return nil
+		return nil, nil
 	}
 
 	By(fmt.Sprint("retrying waiting for Preview URL to be working with exponential backoff to ensure it completes"), func() {
-		err := Retry(TimeoutPreviewUrlReturns, f)
+		_, err := Retry(TimeoutPreviewUrlReturns, f)
 		Expect(err).ShouldNot(HaveOccurred(), "preview environment visible at a URL")
 	})
 	return nil
@@ -1151,22 +1152,19 @@ func (t *TestOptions) WaitForPullRequestToMerge(provider gits.GitProvider, owner
 */
 
 // Retry retries the given function up to the maximum duration
-func Retry(maxDuration time.Duration, f func() error) error {
-	exponentialBackOff := backoff.NewExponentialBackOff()
-	exponentialBackOff.MaxElapsedTime = maxDuration
-	exponentialBackOff.MaxInterval = 20 * time.Second
-	exponentialBackOff.Reset()
-	utils.LogInfof("retrying for duration %#v with max interval %#v\n", maxDuration, exponentialBackOff.MaxInterval)
-	err := backoff.Retry(f, exponentialBackOff)
-	return err
+func Retry[T any](maxElapsedTime time.Duration, f backoff.Operation[T]) (T, error) {
+	bo := backoff.NewExponentialBackOff()
+	bo.MaxInterval = 20 * time.Second
+	bo.Reset()
+	utils.LogInfof("retrying for duration %#v with max interval %#v\n", maxElapsedTime, bo.MaxInterval)
+	return backoff.Retry(context.TODO(), f, backoff.WithBackOff(bo), backoff.WithMaxElapsedTime(maxElapsedTime))
 }
 
 // RetryExponentialBackoff retries the given function up to the maximum duration
-func RetryExponentialBackoff(maxDuration time.Duration, f func() error) error {
+func RetryExponentialBackoff[T any](maxDuration time.Duration, f backoff.Operation[T]) error {
 	exponentialBackOff := backoff.NewExponentialBackOff()
-	exponentialBackOff.MaxElapsedTime = maxDuration
 	exponentialBackOff.Reset()
-	err := backoff.Retry(f, exponentialBackOff)
+	_, err := backoff.Retry(context.TODO(), f, backoff.WithBackOff(exponentialBackOff), backoff.WithMaxElapsedTime(maxDuration))
 	return err
 }
 
@@ -1208,14 +1206,14 @@ func (t *TestOptions) ThereShouldBeAJobThatCompletesSuccessfully(jobName string,
 	argsStr := strings.Join(args, " ")
 	out := ""
 	var activities map[string]*parsers.Activity
-	f := func() error {
+	f := func() (any, error) {
 		var err error
 		By(fmt.Sprintf("calling jx %s", argsStr), func() {
 			out, err = r.RunWithOutput(args...)
 		})
 		out, err = r.RunWithOutput(args...)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		activities, err = parsers.ParseJxGetActivities(out)
 		// TODO fails on --ng for now...
@@ -1224,9 +1222,9 @@ func (t *TestOptions) ThereShouldBeAJobThatCompletesSuccessfully(jobName string,
 			utils.LogInfof("got error parsing activities: %s\n", err.Error())
 		}
 		if len(activities) == 0 {
-			return errors.Errorf("no activities yet")
+			return nil, fmt.Errorf("no activities yet")
 		}
-		return err
+		return nil, err
 	}
 
 	// Sleep 15 seconds to make sure that PipelineActivity gets updated after the run has completed
@@ -1283,13 +1281,13 @@ func (t *TestOptions) ViewBootJob(maxDuration time.Duration) {
 
 // ExpectCommandExecution performs the given command in the current work directory and asserts that it completes successfully
 func (t *TestOptions) ExpectCommandExecution(dir string, commandTimeout time.Duration, exitCode int, c string, args ...string) {
-	f := func() error {
+	f := func() (interface{}, error) {
 		command := exec.Command(c, args...)
 		command.Dir = dir
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		session.Wait(commandTimeout)
 		Eventually(session).Should(gexec.Exit(exitCode))
-		return err
+		return nil, err
 	}
 	err := RetryExponentialBackoff(TimeoutCmdLine, f)
 	Expect(err).ShouldNot(HaveOccurred())
@@ -1310,7 +1308,7 @@ func (t *TestOptions) ExpectJxExecutionWithOutput(dir string, commandTimeout tim
 // ExpectUrlReturns expects that the given URL returns the given status code within the given time period
 func (t *TestOptions) ExpectUrlReturns(url string, expectedStatusCode int, maxDuration time.Duration) error {
 	lastLoggedStatus := -1
-	f := func() error {
+	f := func() (any, error) {
 		skipVerify := false
 		if strings.ToLower(InsecureURLSkipVerify) == "true" {
 			skipVerify = true
@@ -1326,7 +1324,7 @@ func (t *TestOptions) ExpectUrlReturns(url string, expectedStatusCode int, maxDu
 		}
 		response, err := httpClient.Get(url)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		actualStatusCode := response.StatusCode
 		if actualStatusCode != lastLoggedStatus {
@@ -1334,9 +1332,9 @@ func (t *TestOptions) ExpectUrlReturns(url string, expectedStatusCode int, maxDu
 			utils.LogInfof("Invoked %s and got return code: %s\n", termcolor.ColorInfo(url), termcolor.ColorInfo(strconv.Itoa(actualStatusCode)))
 		}
 		if actualStatusCode == expectedStatusCode {
-			return nil
+			return nil, nil
 		}
-		return fmt.Errorf("invalid HTTP status code for %s expected %d but got %d", url, expectedStatusCode, actualStatusCode)
+		return nil, fmt.Errorf("invalid HTTP status code for %s expected %d but got %d", url, expectedStatusCode, actualStatusCode)
 	}
 	return RetryExponentialBackoff(maxDuration, f)
 }
@@ -1369,7 +1367,7 @@ func (t *TestOptions) GitProviderURL() (string, error) {
 		return "", err
 	}
 	if len(gitServers) < 1 {
-		return "", errors.Errorf("Must be at least 1 git server configured")
+		return "", fmt.Errorf("Must be at least 1 git server configured")
 	}
 
 	return gitServers[0].Url, nil

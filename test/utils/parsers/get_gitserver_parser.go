@@ -1,7 +1,7 @@
 package parsers
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 	"strings"
 )
 
@@ -28,7 +28,7 @@ func ParseJxGetGitServer(s string) ([]GitServer, error) {
 		line = strings.TrimSpace(line)
 		fields := strings.Fields(line)
 		if len(fields) != 3 {
-			return nil, errors.Errorf("must be three fields in %s, entire output was %s", line, s)
+			return nil, fmt.Errorf("must be three fields in %s, entire output was %s", line, s)
 		}
 		answer = append(answer, GitServer{
 			Name: fields[0],

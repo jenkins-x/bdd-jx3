@@ -2,9 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jxclient"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jxenv"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,13 +9,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jxclient"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jxenv"
+
 	"github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned"
 	"github.com/onsi/ginkgo/config"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/jenkins-x/bdd-jx/test/utils"
-	"github.com/jenkins-x/bdd-jx/test/utils/runner"
-	"github.com/pkg/errors"
+	"github.com/jenkins-x/bdd-jx3/test/utils"
+	"github.com/jenkins-x/bdd-jx3/test/utils/runner"
 
 	gr "github.com/onsi/ginkgo/reporters"
 
@@ -77,7 +77,7 @@ var SynchronizedAfterSuiteCallback = func() {
 func ensureConfiguration() error {
 	cwd, err := os.Getwd()
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	_, found := os.LookupEnv("BDD_JX")
@@ -88,22 +88,22 @@ func ensureConfiguration() error {
 	r := runner.New(cwd, &TimeoutSessionWait, 0)
 	version, err := r.RunWithOutput("--version")
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	kubeClient, ns, err := kube.LazyCreateKubeClientAndNamespace(nil, "")
 	if err != nil {
-		return errors.Wrap(errors.WithStack(err), "failed to create kubeClient")
+		return fmt.Errorf("failed to create kubeClient: %w", err)
 	}
 	jxClient, err := jxclient.LazyCreateJXClient(nil)
 	if err != nil {
-		return errors.Wrap(errors.WithStack(err), "failed to create jxClient")
+		return fmt.Errorf("failed to create jxClient: %w", err)
 	}
 
 	gitOrganisation := os.Getenv("GIT_ORGANISATION")
 	if gitOrganisation == "" {
 		gitOrganisation, err = findDefaultOrganisation(kubeClient, jxClient, ns)
 		if err != nil {
-			return errors.Wrapf(errors.WithStack(err), "failed to find gitOrganisation in namespace %s", ns)
+			return fmt.Errorf("failed to find gitOrganisation in namespace %s: %w", ns, err)
 		}
 		if gitOrganisation == "" {
 			gitOrganisation = "jenkins-x-tests"

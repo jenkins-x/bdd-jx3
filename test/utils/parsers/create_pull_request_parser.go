@@ -2,7 +2,7 @@ package parsers
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
+
 	"regexp"
 	"strconv"
 	"strings"
@@ -27,11 +27,11 @@ func ParseJxCreatePullRequest(s string) (*CreatePullRequest, error) {
 	s = strings.TrimPrefix(s, CreatedPRLogLinePrefix)
 	parts := createPullRequestOutputRegex.FindStringSubmatch(s)
 	if len(parts) != 5 {
-		return nil, errors.Errorf("Unable to parse %s as output from jx create pull request and has parts %#v", s, parts)
+		return nil, fmt.Errorf("Unable to parse %s as output from jx create pull request and has parts %#v", s, parts)
 	}
 	prn, err := strconv.Atoi(parts[4])
 	if err != nil {
-		return nil, errors.Wrapf(err, "converting pull request number %s to int, entire output was %s and has parts %#v", parts[4], s, parts)
+		return nil, fmt.Errorf("converting pull request number %s to int, entire output was %s and has parts %#v: %w", parts[4], s, parts, err)
 	}
 	owner := parts[2]
 	provider := parts[1]

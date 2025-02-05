@@ -1,6 +1,8 @@
 package parsers
 
-import "strings"
+import (
+	"strings"
+)
 
 func ParseJxGetQuickstarts(s string) (map[string]string, error) {
 	answer := make(map[string]string)

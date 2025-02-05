@@ -3,7 +3,7 @@ package step_test
 import (
 	"testing"
 
-	"github.com/jenkins-x/bdd-jx/test/helpers"
+	"github.com/jenkins-x/bdd-jx3/test/helpers"
 
 	. "github.com/onsi/ginkgo"
 )

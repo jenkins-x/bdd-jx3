@@ -4,14 +4,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jenkins-x/bdd-jx/test/helpers"
+	"github.com/jenkins-x/bdd-jx3/test/helpers"
 
 	. "github.com/onsi/ginkgo"
 
 	// lets import the tests
-	_ "github.com/jenkins-x/bdd-jx/test/suite/quickstart"
+	_ "github.com/jenkins-x/bdd-jx3/test/suite/quickstart"
 	// lets import the tests
-	_ "github.com/jenkins-x/bdd-jx/test/suite/spring"
+	_ "github.com/jenkins-x/bdd-jx3/test/suite/spring"
 )
 
 // TestSuite runs one or more tests using environment variables to define the tests to run

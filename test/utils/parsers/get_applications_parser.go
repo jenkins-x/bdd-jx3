@@ -1,11 +1,10 @@
 package parsers
 
 import (
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type Application struct {
@@ -36,22 +35,22 @@ func ParseJxGetApplications(s string) (map[string]Application, error) {
 		line = strings.TrimSpace(line)
 		fields := strings.Fields(line)
 		if len(fields) < 3 {
-			return nil, errors.Errorf("must be at least %d fields in %s, entire output was %s", 3, line, s)
+			return nil, fmt.Errorf("must be at least %d fields in %s, entire output was %s", 3, line, s)
 		}
 		var desiredPods, runningPods int
 		if len(fields) == 4 {
 			pods := strings.Split(fields[2], "/")
 			if len(pods) != 2 {
-				return nil, errors.Errorf("cannot parse %s as 1/1, entire output was %s", pods, s)
+				return nil, fmt.Errorf("cannot parse %s as 1/1, entire output was %s", pods, s)
 			}
 			var err error
 			desiredPods, err = strconv.Atoi(pods[1])
 			if err != nil {
-				return nil, errors.Wrapf(err, "cannot convert %v to integer, entire output was %s", desiredPods, s)
+				return nil, fmt.Errorf("cannot convert %v to integer, entire output was %s: %w", desiredPods, s, err)
 			}
 			runningPods, err = strconv.Atoi(pods[0])
 			if err != nil {
-				return nil, errors.Wrapf(err, "cannot convert %v to integer, entire output was %s", runningPods, s)
+				return nil, fmt.Errorf("cannot convert %v to integer, entire output was %s: %w", runningPods, s, err)
 			}
 		}
 		app := Application{
@@ -67,7 +66,7 @@ func ParseJxGetApplications(s string) (map[string]Application, error) {
 			// scheme.
 			u, err := url.Parse(urlString)
 			if err != nil {
-				return nil, errors.Wrapf(err, "parsing URL %s from full output %s", urlString, s)
+				return nil, fmt.Errorf("parsing URL %s from full output %s: %w", urlString, s, err)
 			}
 			if u != nil && u.Scheme != "" {
 				app.Url = urlString

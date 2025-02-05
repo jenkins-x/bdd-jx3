@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jenkins-x/bdd-jx/test/helpers"
+	"github.com/jenkins-x/bdd-jx3/test/helpers"
 
-	"github.com/jenkins-x/bdd-jx/test/utils"
+	"github.com/jenkins-x/bdd-jx3/test/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
